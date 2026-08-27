@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Ball.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">inkball_scaffold</a> &gt; <a href="index.source.html" class="el_package">inkball</a> &gt; <span class="el_source">Ball.java</span></div><h1>Ball.java</h1><pre class="source lang-java linenums">package inkball;
+
+
+import processing.core.PApplet;
+import processing.core.PImage;
+import java.util.Map;
+import processing.core.PVector;
+import java.util.List;
+
+
+public class Ball {
+   private float x, y; 
+   private float vx, vy; 
+   private String type; 
+   private PImage image;  
+   private boolean isRemoved;
+   private float radius;
+
+    /**
+     * Constructor of the ball class
+     */
+<span class="fc" id="L22">   public Ball(float x, float y, float vx, float vy, String type, PImage image) {</span>
+<span class="fc" id="L23">       this.x = x;</span>
+<span class="fc" id="L24">       this.y = y;</span>
+<span class="fc" id="L25">       this.vx = vx;</span>
+<span class="fc" id="L26">       this.vy = vy;</span>
+<span class="fc" id="L27">       this.type = type;</span>
+<span class="fc" id="L28">       this.image = image;</span>
+<span class="fc" id="L29">       this.isRemoved = false; </span>
+<span class="fc" id="L30">       this.radius = image.width / 2;</span>
+<span class="fc" id="L31">   }</span>
+
+   public String getType() {
+<span class="fc" id="L34">    return type; </span>
+   }
+
+   public float getVx() {
+<span class="fc" id="L38">       return vx;</span>
+   }
+
+   public float getX() {
+<span class="fc" id="L42">       return x;</span>
+   }
+
+   public float getY() {
+<span class="fc" id="L46">       return y;</span>
+   }
+
+   public float getVy() {
+<span class="fc" id="L50">       return vy;</span>
+   }
+
+   public PImage getImage() {
+<span class="fc" id="L54">    return image;</span>
+   }
+
+   public void setVx(float vx) {
+<span class="fc" id="L58">       this.vx = vx;</span>
+<span class="fc" id="L59">   }</span>
+
+
+   public void setVy(float vy) {
+<span class="fc" id="L63">       this.vy = vy;</span>
+<span class="fc" id="L64">   }</span>
+
+   /**
+     * It modifies the ball’s behaviour based on interactions with the environment. 
+     */
+   public void update(char[][] tiles, Map&lt;String, PImage&gt; images, int boardWidth, int boardHeight, List&lt;List&lt;PVector&gt;&gt; lines) {
+<span class="fc" id="L70">       float nextX = x + vx;</span>
+<span class="fc" id="L71">       float nextY = y + vy;</span>
+  
+<span class="fc" id="L73">       int nextTileX = (int) (nextX / App.CELLSIZE);</span>
+<span class="fc" id="L74">       int nextTileY = (int) ((nextY - App.TOPBAR) / App.CELLSIZE);</span>
+  
+<span class="fc" id="L76">       int ballWidth = image.width;</span>
+<span class="fc" id="L77">       int ballHeight = image.height;</span>
+  
+<span class="pc bpc" id="L79" title="3 of 8 branches missed.">       if (nextTileX &gt;= 0 &amp;&amp; nextTileX &lt; boardWidth &amp;&amp; nextTileY &gt;= 0 &amp;&amp; nextTileY &lt; boardHeight) {</span>
+<span class="fc" id="L80">           char tile = tiles[nextTileY][nextTileX];</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">           if (isHole(tile)) {</span>
+<span class="nc" id="L82">               isRemoved = true;</span>
+<span class="nc" id="L83">               return;</span>
+           }
+       }
+  
+<span class="pc bpc" id="L87" title="2 of 4 branches missed.">       if (nextTileX &gt;= 0 &amp;&amp; nextTileX &lt; boardWidth) {</span>
+<span class="fc" id="L88">           char tileLeft = tiles[(int) ((y - App.TOPBAR) / App.CELLSIZE)][nextTileX];</span>
+<span class="fc" id="L89">           char tileRight = tiles[(int) ((y - App.TOPBAR) / App.CELLSIZE)][(int) ((nextX + ballWidth) / App.CELLSIZE)];</span>
+  
+<span class="pc bpc" id="L91" title="2 of 6 branches missed.">           if ((isWall(tileLeft) || isWall(tileRight)) &amp;&amp; !isHole(tileLeft)) {</span>
+<span class="fc" id="L92">               vx = -vx; </span>
+<span class="fc" id="L93">               nextX = x; </span>
+<span class="fc" id="L94">               changeColor(tileLeft, tileRight, images); </span>
+           }
+       }
+  
+<span class="pc bpc" id="L98" title="1 of 4 branches missed.">       if (nextTileY &gt;= 0 &amp;&amp; nextTileY &lt; boardHeight) {</span>
+<span class="fc" id="L99">           char tileTop = tiles[nextTileY][(int) (x / App.CELLSIZE)];</span>
+<span class="fc" id="L100">           char tileBottom = tiles[(int) ((nextY + ballHeight - App.TOPBAR) / App.CELLSIZE)][(int) (x / App.CELLSIZE)];</span>
+  
+<span class="pc bpc" id="L102" title="4 of 6 branches missed.">           if ((isWall(tileTop) || isWall(tileBottom)) &amp;&amp; !isHole(tileTop)) {</span>
+<span class="nc" id="L103">               vy = -vy; </span>
+<span class="nc" id="L104">               nextY = y;</span>
+<span class="nc" id="L105">               changeColor(tileTop, tileBottom, images); </span>
+           }
+       }
+  
+<span class="fc bfc" id="L109" title="All 2 branches covered.">       for (List&lt;PVector&gt; line : lines) {</span>
+<span class="fc" id="L110">           boolean collisionOccurred = false;</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">           for (int j = 0; j &lt; line.size() - 1; j++) {</span>
+<span class="fc" id="L112">               PVector p1 = line.get(j);</span>
+<span class="fc" id="L113">               PVector p2 = line.get(j + 1);</span>
+  
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">               if (isCollidingWithLine(p1, p2)) {</span>
+<span class="fc" id="L116">                   reflectVelocity(p1, p2);</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">                   for (PVector point : line) {</span>
+<span class="fc" id="L118">                       point.y = App.HEIGHT + 100;</span>
+<span class="fc" id="L119">                   }</span>
+  
+<span class="fc" id="L121">                   collisionOccurred = true; </span>
+<span class="fc" id="L122">                   break;</span>
+               }
+           }
+  
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">           if (collisionOccurred) {</span>
+<span class="fc" id="L127">               break; </span>
+           }
+<span class="nc" id="L129">       }</span>
+<span class="fc" id="L130">       x = nextX;</span>
+<span class="fc" id="L131">       y = nextY;</span>
+<span class="fc" id="L132">   }</span>
+
+   private boolean isWall(char tile) {
+<span class="pc bpc" id="L135" title="4 of 10 branches missed.">       return tile == 'X' || tile == '1' || tile == '2' || tile == '3' || tile == '4';</span>
+   }
+
+   private boolean isHole(char tile) {
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">       return tile == 'H';</span>
+   }
+
+   protected void changeColor(char tile1, char tile2, Map&lt;String, PImage&gt; images) {
+<span class="pc bpc" id="L143" title="1 of 4 branches missed.">       if (tile1 == '1' || tile2 == '1') {</span>
+<span class="fc" id="L144">           image = images.get(&quot;B1&quot;); </span>
+<span class="pc bpc" id="L145" title="1 of 4 branches missed.">       } else if (tile1 == '2' || tile2 == '2') {</span>
+<span class="fc" id="L146">           image = images.get(&quot;B2&quot;); </span>
+<span class="pc bpc" id="L147" title="1 of 4 branches missed.">       } else if (tile1 == '3' || tile2 == '3') {</span>
+<span class="fc" id="L148">           image = images.get(&quot;B3&quot;);</span>
+<span class="pc bpc" id="L149" title="1 of 4 branches missed.">       } else if (tile1 == '4' || tile2 == '4') {</span>
+<span class="fc" id="L150">           image = images.get(&quot;B4&quot;); </span>
+       }
+<span class="fc" id="L152">   }</span>
+
+   public boolean isRemoved() {
+<span class="fc" id="L155">       return isRemoved;</span>
+   }
+
+   public void setRemoved(boolean removed) {
+<span class="nc" id="L159">    this.isRemoved = removed; </span>
+<span class="nc" id="L160">    }</span>
+
+   private boolean isCollidingWithLine(PVector p1, PVector p2) {
+<span class="fc" id="L163">       float distance = distToSegment(new PVector(x + vx, y + vy), p1, p2);</span>
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">       return distance &lt;= radius; </span>
+   }
+
+   protected void reflectVelocity(PVector p1, PVector p2) {
+<span class="fc" id="L168">       PVector lineDirection = PVector.sub(p2, p1).normalize();</span>
+<span class="fc" id="L169">       PVector normal = new PVector(-lineDirection.y, lineDirection.x);</span>
+      
+<span class="fc" id="L171">       float dotProduct = vx * normal.x + vy * normal.y;</span>
+<span class="fc" id="L172">       vx = vx - 2 * dotProduct * normal.x;</span>
+<span class="fc" id="L173">       vy = vy - 2 * dotProduct * normal.y;</span>
+<span class="fc" id="L174">   }</span>
+
+   /**
+     * It calculates the shortest distance from a given point (point)
+     * to a line segment defined by two points, v and w, in 2D space. 
+     */
+   protected float distToSegment(PVector point, PVector v, PVector w) {
+<span class="fc" id="L181">       float l2 = v.dist(w) * v.dist(w); </span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">       if (l2 == 0) return point.dist(v); </span>
+<span class="fc" id="L183">       float t = Math.max(0, Math.min(1, PVector.sub(point, v).dot(PVector.sub(w, v)) / l2));</span>
+<span class="fc" id="L184">       PVector projection = PVector.add(v, PVector.mult(PVector.sub(w, v), t));</span>
+<span class="fc" id="L185">       return point.dist(projection);</span>
+   }
+
+
+   public void draw(PApplet app) {
+<span class="pc bpc" id="L190" title="1 of 2 branches missed.">       if (!isRemoved) {</span>
+<span class="fc" id="L191">           app.image(image, x, y); </span>
+       }
+<span class="fc" id="L193">   }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
